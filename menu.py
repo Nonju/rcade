@@ -1,6 +1,7 @@
 import pygame
 
 from enum import Enum
+import os
 
 from constants import colors
 from utils.keystate import KeyState
@@ -34,14 +35,16 @@ class Menu:
 			dict(title=u'Avsluta', action=self.quit)
 		]
 		self.items[MenuState.GAMESELECT.value] = self.getGameItems()
-		# TODO: Build from imported 'game'-objects in 'games' directory
 
 	def getHeaderFontSize(self):
 		_, h = self.surface.get_size()
 		return int(h * 0.2)
 
 	def getGameItems(self):
-		items = [] # TODO: Build from imported 'game'-objects in 'games' directory
+		items = []
+		path = '{}/games/'.format(os.getcwd())
+		games = [name for name in os.listdir(path) if os.path.isdir(path+name) and name[0] != '_']
+		items += [dict(title=game, action=self.gotoGame) for game in games]
 		items.append(dict(title=u'<< Meny', action=self.gotoStart))
 		return items
 
@@ -50,6 +53,13 @@ class Menu:
 
 	def gotoSelect(self):
 		self.state = MenuState.GAMESELECT.value
+
+	def gotoGame(self):
+		state = MenuState.GAMESELECT.value
+		game = self.items[state][self.active[state]]['title']
+
+		cmd = 'python {}/games/{}/game.py'.format(os.getcwd(), game)
+		os.system(cmd)
 
 	def quit(self):
 		e = pygame.event.Event(pygame.locals.QUIT)

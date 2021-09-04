@@ -1,25 +1,20 @@
 import pygame
-from pygame.locals import *
+from pygame.locals import QUIT
+
+# Init
+pygame.init()
 
 import sys
 from enum import Enum
 
 from constants import colors
+from constants.window import FPS, SCREEN_WIDTH, SCREEN_HEIGHT
 from menu import Menu
 from utils.keystate import KeyState
 from events import LOADGAME
 
-# Init
-pygame.init()
-
-FPS = 30
-FramePerSec = pygame.time.Clock()
-
-
 # Screen
-screen_info = pygame.display.Info()
-SCREEN_WIDTH = min(screen_info.current_w, 1024)
-SCREEN_HEIGHT = min(screen_info.current_h, 800)
+FramePerSec = pygame.time.Clock()
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 DISPLAYSURF.fill(colors.BLACK)
 pygame.display.set_caption('R-Cade')
@@ -59,6 +54,7 @@ def main():
 
 		pygame.display.update()
 		FramePerSec.tick(FPS)
+
 
 if __name__ == '__main__':
 	main()

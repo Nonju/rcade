@@ -44,7 +44,7 @@ def main():
 			game.update(events)
 			game.draw()
 		elif state == MainState.MENU:
-			menu.update()
+			menu.update(events)
 			menu.draw()
 		else:
 			# Revert to menu on state exception

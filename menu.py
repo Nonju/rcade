@@ -5,6 +5,7 @@ import os
 
 from constants import colors
 from utils.keystate import KeyState
+from utils import ThrottledUpdate
 from events import LOADGAME
 
 from games import gamesList
@@ -18,6 +19,7 @@ class Menu:
 	def __init__(self, surface):
 
 		self.surface = surface
+		self.throttledUpdate = ThrottledUpdate()
 
 		# self.state = MenuState.START.value
 		self.gotoStart()
@@ -67,7 +69,10 @@ class Menu:
 		e = pygame.event.Event(pygame.locals.QUIT)
 		pygame.event.post(e)
 
-	def update(self):
+	def update(self, events):
+		if not self.throttledUpdate.shouldUpdate(events):
+			return
+
 		if KeyState.up():
 			self.active[self.state] = max([0, self.active[self.state]-1])
 		elif KeyState.down():

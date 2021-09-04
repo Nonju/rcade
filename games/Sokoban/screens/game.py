@@ -6,6 +6,7 @@ from enum import Enum
 
 from ..constants import colors
 from ..utils import KeyPressHandler
+from utils import ThrottledUpdate
 from ..states import GameState
 
 LEVEL_DIR = '/../levels/'
@@ -38,6 +39,7 @@ class Game:
 
         self.surface = surface
         self.state = GameState.PLAY
+        self.throttledUpdate = ThrottledUpdate()
 
         self.playerPos = (1, 1) # position x / y # TODO(?): Move to player object
         self.targetPos = [] # List of box target positions [(x,y), (x,y)]
@@ -142,6 +144,8 @@ class Game:
             self.state = GameState.WIN
 
     def update(self, events):
+        if not self.throttledUpdate.shouldUpdate(events):
+            return
 
         if KeyPressHandler.up():
             self.move(Direction.UP)

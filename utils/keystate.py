@@ -15,6 +15,10 @@ class KeyState:
 				cls.lastPressed.remove(event.key)
 
 	@classmethod
+	def getEvents(cls):
+		return [pygame.KEYDOWN, pygame.KEYUP]
+
+	@classmethod
 	def pressed(cls, keys, single=False):
 		if not isinstance(keys, list):
 			keys = [keys]

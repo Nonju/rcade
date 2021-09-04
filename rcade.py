@@ -7,6 +7,7 @@ from enum import Enum
 from constants import colors
 from menu import Menu
 from utils.keystate import KeyState
+from events import LOADGAME
 
 # Init
 pygame.init()
@@ -39,9 +40,13 @@ def main():
 			if event.type == QUIT:
 				pygame.quit()
 				sys.exit()
+			elif event.type == LOADGAME:
+				if event.game.get('cls'):
+					game = event.game['cls'](DISPLAYSURF)
+				state = MainState.GAME
 
 		if state == MainState.GAME and game:
-			game.update()
+			game.update(events)
 			game.draw()
 		elif state == MainState.MENU:
 			menu.update()

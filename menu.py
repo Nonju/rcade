@@ -5,6 +5,9 @@ import os
 
 from constants import colors
 from utils.keystate import KeyState
+from events import LOADGAME
+
+from games import gamesList
 
 
 class MenuState(Enum):
@@ -42,9 +45,8 @@ class Menu:
 
 	def getGameItems(self):
 		items = []
-		path = '{}/games/'.format(os.getcwd())
-		games = [name for name in os.listdir(path) if os.path.isdir(path+name) and name[0] != '_']
-		items += [dict(title=game, action=self.gotoGame) for game in games]
+		for game in gamesList:
+			items.append(dict(title=game.get('title', 'No name'), game=game, action=self.gotoGame))
 		items.append(dict(title=u'<< Meny', action=self.gotoStart))
 		return items
 
@@ -56,10 +58,10 @@ class Menu:
 
 	def gotoGame(self):
 		state = MenuState.GAMESELECT.value
-		game = self.items[state][self.active[state]]['title']
+		item = self.items[state][self.active[state]]
 
-		cmd = 'python {}/games/{}/game.py'.format(os.getcwd(), game)
-		os.system(cmd)
+		e = pygame.event.Event(LOADGAME, game=item.get('game'))
+		pygame.event.post(e)
 
 	def quit(self):
 		e = pygame.event.Event(pygame.locals.QUIT)

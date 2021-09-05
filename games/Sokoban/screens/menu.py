@@ -15,9 +15,9 @@ class Menu:
 
         self.active = 0 # Active option
         self.options = [
-            dict(title=u'Spela!', click=self.newGame),
-            dict(title=u'Highscore', click=self.gotoHighscore),
-            dict(title=u'Avsluta', click=self.quit)
+            dict(title=u'Spela!', action=self.newGame),
+            dict(title=u'Highscore', action=self.gotoHighscore),
+            dict(title=u'Avsluta', action=self.quit)
         ]
 
         self.headerFont = pygame.font.SysFont(pygame.font.get_default_font(), self.getHeaderFontSize())

@@ -1,12 +1,16 @@
 
 from constants.window import FPS
-from utils import KeyState
+from utils import KeyState, ControllerState
 
 class ThrottledUpdate:
 	def __init__(self, ticks=None, refreshEvents=[]):
 		self.ticks = ticks or (FPS//6) # By default, update 6 times a second
 		self.last = 0
-		self.refreshEvents = refreshEvents # Option to refresh on additional events
+
+		self.refreshEvents = KeyState.getEvents()
+		self.refreshEvents += ControllerState.getEvents()
+		if isinstance(refreshEvents, list): # Option to refresh on additional events
+			self.refreshEvents += refreshEvents
 
 	def shouldUpdate(self, events=[]):
 		self.last += 1 # Increment tick
@@ -15,11 +19,7 @@ class ThrottledUpdate:
 			self.last = 0
 			return True
 
-		refreshEvents = KeyState.getEvents()
-		if isinstance(self.refreshEvents, list):
-			refreshEvents += self.refreshEvents
-
-		if any(event.type in refreshEvents for event in events):
+		if any(event.type in self.refreshEvents for event in events):
 			self.last = 0
 			return True
 

@@ -4,8 +4,7 @@ import os
 
 from ..constants import colors
 from ..events import GOTOGAME
-from ..utils import KeyPressHandler
-from utils import ThrottledUpdate
+from utils import KeyState, ThrottledUpdate
 
 LEVEL_DIR = '/../levels/'
 
@@ -44,11 +43,11 @@ class LevelSelect:
             return
 
         # Handle movement
-        if KeyPressHandler.up():
+        if KeyState.up():
             self.active = max(self.active-1, 0)
-        elif KeyPressHandler.down():
+        elif KeyState.down():
             self.active = min(self.active+1, len(self.levels)-1)
-        elif KeyPressHandler.enter():
+        elif KeyState.enter():
             level = self.levels[self.active]
             self.startGame(level)
 

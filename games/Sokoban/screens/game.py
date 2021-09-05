@@ -5,8 +5,7 @@ import os
 from enum import Enum
 
 from ..constants import colors
-from ..utils import KeyPressHandler
-from utils import ThrottledUpdate
+from utils import KeyState, ThrottledUpdate
 from ..states import GameState
 
 LEVEL_DIR = '/../levels/'
@@ -147,13 +146,13 @@ class Game:
         if not self.throttledUpdate.shouldUpdate(events):
             return
 
-        if KeyPressHandler.up():
+        if KeyState.up():
             self.move(Direction.UP)
-        elif KeyPressHandler.down():
+        elif KeyState.down():
             self.move(Direction.DOWN)
-        elif KeyPressHandler.left():
+        elif KeyState.left():
             self.move(Direction.LEFT)
-        elif KeyPressHandler.right():
+        elif KeyState.right():
             self.move(Direction.RIGHT)
 
         self.checkWin()

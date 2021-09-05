@@ -3,8 +3,7 @@ import pygame
 
 from ..constants import colors
 from ..events import GOTOLEVELSELECT
-from ..utils import KeyPressHandler
-from utils import ThrottledUpdate
+from utils import KeyState, ThrottledUpdate
 
 class Menu:
     def __init__(self, surface):
@@ -46,12 +45,12 @@ class Menu:
             return
 
         # Handle movement
-        if KeyPressHandler.up():
+        if KeyState.up():
             self.active = max(self.active-1, 0)
-        elif KeyPressHandler.down():
+        elif KeyState.down():
             self.active = min(self.active+1, len(self.options)-1)
-        elif KeyPressHandler.enter():
-            self.options[self.active]['click']()
+        elif KeyState.enter():
+            self.options[self.active]['action']()
 
     def draw(self):
         self.surface.fill(colors.CORNFLOWERBLUE) # Should this be placed in __init__ instead?

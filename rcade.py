@@ -10,7 +10,7 @@ from enum import Enum
 from constants import colors
 from constants.window import FPS, SCREEN_WIDTH, SCREEN_HEIGHT
 from menu import Menu
-from utils.keystate import KeyState
+from utils import KeyState, ControllerState
 from events import LOADGAME
 
 # Screen
@@ -19,6 +19,8 @@ DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 DISPLAYSURF.fill(colors.BLACK)
 pygame.display.set_caption('R-Cade')
 
+# Init controller support
+ControllerState.init()
 
 class MainState(Enum):
 	MENU = 0

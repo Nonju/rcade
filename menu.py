@@ -4,8 +4,7 @@ from enum import Enum
 import os
 
 from constants import colors
-from utils.keystate import KeyState
-from utils import ThrottledUpdate
+from utils import KeyState, ThrottledUpdate
 from events import LOADGAME
 
 from games import gamesList
@@ -77,7 +76,7 @@ class Menu:
 			self.active[self.state] = max([0, self.active[self.state]-1])
 		elif KeyState.down():
 			self.active[self.state] = min([len(self.items[self.state])-1, self.active[self.state]+1])
-		elif KeyState.enter(single=True):
+		elif KeyState.enter():
 			self.items[self.state][self.active[self.state]]['action']()
 
 

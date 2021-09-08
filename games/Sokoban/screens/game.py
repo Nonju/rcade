@@ -4,9 +4,11 @@ import math
 import os
 from enum import Enum
 
-from ..constants import colors
+from constants import window
 from utils import KeyState, ThrottledUpdate
+from ..constants import colors
 from ..states import GameState
+from ..events import GOTOMENU
 
 LEVEL_DIR = '/../levels/'
 
@@ -40,13 +42,12 @@ class Game:
         self.state = GameState.PLAY
         self.throttledUpdate = ThrottledUpdate()
 
-        self.playerPos = (1, 1) # position x / y # TODO(?): Move to player object
+        self.playerPos = (1, 1) # position x / y
         self.targetPos = [] # List of box target positions [(x,y), (x,y)]
         self.level = self.loadLevel(level) # TODO: Check if should store in separate "level" object
 
-        longestSide = max(len(self.level), *map(len, self.level))
-        (w, h) = pygame.display.get_surface().get_size()
-        self.tileWidth = math.ceil(min([w,h]) / longestSide)
+        longestSide = max(len(self.level), * map(len, self.level))
+        self.tileWidth = math.ceil(min([window.SCREEN_WIDTH, window.SCREEN_HEIGHT]) / longestSide)
         self.offset = self.tileWidth * 2
 
         self.wallImage = pygame.image.load(os.path.join(os.path.dirname(__file__), '../assets','wall.png')).convert_alpha()
@@ -54,8 +55,19 @@ class Game:
 
         self.imageGroup = pygame.sprite.Group()
 
+        # Victory screen
+        self.menuEvent = pygame.event.Event(GOTOMENU)
+        self.clock = pygame.time.Clock()
+        self.timeSinceVictory = 0
+        self.victoryKeyInputCooldown = 2000 # 2s
+
+        self.victoryFont = pygame.font.SysFont(pygame.font.get_default_font(), int(window.SCREEN_HEIGHT * 0.25))
+        self.victorySurf = self.victoryFont.render('Du vann!!', False, colors.WHITE)
+        self.gotoMenuFont = pygame.font.SysFont(pygame.font.get_default_font(), int(window.SCREEN_HEIGHT * 0.05))
+        self.gotoMenuSurf = self.gotoMenuFont.render(u'Tryck på valfri tangent för att fortsätta', False, colors.WHITE)
+
     def loadLevel(self, level=''):
-        print('loadLevel - level', level) # Remove
+        print('loadLevel - level', level)
         if not level:
             raise 'Invalid level path' # TODO: Replace with actual error
 
@@ -142,20 +154,34 @@ class Game:
         if all(bool(self.getTile(target) == Tile.BOX) for target in self.targetPos):
             self.state = GameState.WIN
 
+    def victoryCooldown(self):
+        return self.timeSinceVictory < self.victoryKeyInputCooldown
+
+    def gotoMenu(self):
+        pygame.event.post(self.menuEvent)
+
     def update(self, events):
         if not self.throttledUpdate.shouldUpdate(events):
             return
 
-        if KeyState.up():
-            self.move(Direction.UP)
-        elif KeyState.down():
-            self.move(Direction.DOWN)
-        elif KeyState.left():
-            self.move(Direction.LEFT)
-        elif KeyState.right():
-            self.move(Direction.RIGHT)
+        if self.state in [GameState.PLAY, GameState.PAUSE]:
+            if KeyState.up():
+                self.move(Direction.UP)
+            elif KeyState.down():
+                self.move(Direction.DOWN)
+            elif KeyState.left():
+                self.move(Direction.LEFT)
+            elif KeyState.right():
+                self.move(Direction.RIGHT)
 
-        self.checkWin()
+            self.checkWin()
+
+        elif self.state == GameState.WIN:
+            self.clock.tick()
+            if self.victoryCooldown():
+                self.timeSinceVictory += self.clock.get_rawtime()
+            elif KeyState.any():
+                self.gotoMenu()
 
 
     def drawTile(self, pos):
@@ -207,6 +233,10 @@ class Game:
                     self.drawTile((x, y))
                 self.imageGroup.draw(self.surface)
         elif self.state == GameState.WIN:
-            # TODO: Display victory screen
-            pass
+            victoryRect = self.victorySurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.3))
+            self.surface.blit(self.victorySurf, victoryRect)
+
+            if not self.victoryCooldown():
+                gotoMenuRect = self.gotoMenuSurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.55))
+                self.surface.blit(self.gotoMenuSurf, gotoMenuRect)
 

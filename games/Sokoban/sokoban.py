@@ -2,7 +2,7 @@ import pygame
 
 from ..gamebase import GameBase
 
-from .events import GOTOLEVELSELECT, GOTOGAME
+from .events import GOTOLEVELSELECT, GOTOGAME, GOTOMENU
 from .states import ScreenState
 from .screens import menu, levelselect, game
 
@@ -38,6 +38,9 @@ class Sokoban(GameBase):
                 if bool(event.new):
                     self.game = game.Game(self.surface, level=event.level)
                 self.state = ScreenState.GAME
+            elif event.type == GOTOMENU:
+                self.game = None
+                self.state = ScreenState.MENU
 
         if self.state == ScreenState.MENU:
             self.menu.update(events)

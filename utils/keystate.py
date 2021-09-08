@@ -40,6 +40,10 @@ class KeyState:
 	# Shorthands
 
 	@classmethod
+	def any(cls):
+		return len(cls.lastPressed) > 0
+
+	@classmethod
 	def enter(cls, single=True):
 		keys = [K_RETURN, J_A]
 		return cls.pressed(keys, single=single)

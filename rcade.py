@@ -10,7 +10,7 @@ from enum import Enum
 from constants import colors
 from constants.window import FPS, SCREEN_WIDTH, SCREEN_HEIGHT
 from menu import Menu
-from utils import KeyState, ControllerState
+from utils import KeyState, ControllerState, Delay
 from events import LOADGAME
 
 # Screen
@@ -21,6 +21,9 @@ pygame.display.set_caption('R-Cade')
 
 # Init controller support
 ControllerState.init()
+
+# Init global delay utility
+Delay.init()
 
 class MainState(Enum):
 	MENU = 0
@@ -52,8 +55,11 @@ def main():
 			# Revert to menu on state exception
 			state = MainState.MENU
 
+		# Update utility
 		KeyState.update(events)
+		Delay.update()
 
+		# Update screen
 		pygame.display.update()
 		FramePerSec.tick(FPS)
 

@@ -5,7 +5,7 @@ import os
 from enum import Enum
 
 from constants import window
-from utils import KeyState, ThrottledUpdate
+from utils import KeyState, ThrottledUpdate, Delay
 from ..constants import colors
 from ..states import GameState
 from ..events import GOTOMENU
@@ -57,9 +57,8 @@ class Game:
 
         # Victory screen
         self.menuEvent = pygame.event.Event(GOTOMENU)
-        self.clock = pygame.time.Clock()
-        self.timeSinceVictory = 0
         self.victoryKeyInputCooldown = 2000 # 2s
+        self.victoryCooldown = True
 
         self.victoryFont = pygame.font.SysFont(pygame.font.get_default_font(), int(window.SCREEN_HEIGHT * 0.25))
         self.victorySurf = self.victoryFont.render('Du vann!!', False, colors.WHITE)
@@ -153,9 +152,10 @@ class Game:
     def checkWin(self):
         if all(bool(self.getTile(target) == Tile.BOX) for target in self.targetPos):
             self.state = GameState.WIN
+            Delay.call(f=self.endVictoryCooldown, ms=self.victoryKeyInputCooldown)
 
-    def victoryCooldown(self):
-        return self.timeSinceVictory < self.victoryKeyInputCooldown
+    def endVictoryCooldown(self):
+        self.victoryCooldown = False
 
     def gotoMenu(self):
         pygame.event.post(self.menuEvent)
@@ -177,10 +177,7 @@ class Game:
             self.checkWin()
 
         elif self.state == GameState.WIN:
-            self.clock.tick()
-            if self.victoryCooldown():
-                self.timeSinceVictory += self.clock.get_rawtime()
-            elif KeyState.any():
+            if not self.victoryCooldown and KeyState.any():
                 self.gotoMenu()
 
 
@@ -236,7 +233,7 @@ class Game:
             victoryRect = self.victorySurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.3))
             self.surface.blit(self.victorySurf, victoryRect)
 
-            if not self.victoryCooldown():
+            if not self.victoryCooldown:
                 gotoMenuRect = self.gotoMenuSurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.55))
                 self.surface.blit(self.gotoMenuSurf, gotoMenuRect)
 

@@ -8,7 +8,7 @@ class ThrottledUpdate:
 		self.last = 0
 
 		self.refreshEvents = KeyState.getEvents()
-		self.refreshEvents += ControllerState.getEvents()
+		# self.refreshEvents += ControllerState.getEvents() # Pygame spams controller events --> disable for now
 		if isinstance(refreshEvents, list): # Option to refresh on additional events
 			self.refreshEvents += refreshEvents
 

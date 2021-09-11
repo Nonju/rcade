@@ -57,7 +57,7 @@ def main():
 
 		# Update utility
 		KeyState.update(events)
-		Delay.update()
+		Delay.update(events)
 
 		# Update screen
 		pygame.display.update()

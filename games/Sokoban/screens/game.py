@@ -225,10 +225,10 @@ class Game:
         self.wallGroup.empty()
 
         if self.state in [GameState.PLAY, GameState.PAUSE]:
-            self.wallGroup.draw(self.surface)
             for y in range(len(self.level)):
                 for x in range(len(self.level[y])):
                     self.drawTile((x, y))
+            self.wallGroup.draw(self.surface)
         elif self.state == GameState.WIN:
             victoryRect = self.victorySurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.3))
             self.surface.blit(self.victorySurf, victoryRect)

@@ -3,7 +3,7 @@ import pygame
 
 from ..constants import colors
 from ..events import GOTOLEVELSELECT
-from ..utils import KeyPressHandler
+from utils import KeyState, ThrottledUpdate
 
 class Menu:
     def __init__(self, surface):
@@ -11,12 +11,13 @@ class Menu:
         self.newGameEvent = pygame.event.Event(GOTOLEVELSELECT)
 
         self.surface = surface
+        self.throttledUpdate = ThrottledUpdate()
 
         self.active = 0 # Active option
         self.options = [
-            dict(title=u'Spela!', click=self.newGame),
-            dict(title=u'Highscore', click=self.gotoHighscore),
-            dict(title=u'Avsluta', click=self.quit)
+            dict(title=u'Spela!', action=self.newGame),
+            dict(title=u'Highscore', action=self.gotoHighscore),
+            dict(title=u'Avsluta', action=self.quit)
         ]
 
         self.headerFont = pygame.font.SysFont(pygame.font.get_default_font(), self.getHeaderFontSize())
@@ -40,14 +41,16 @@ class Menu:
         pygame.event.post(e)
 
     def update(self, events):
+        if not self.throttledUpdate.shouldUpdate(events):
+            return
 
         # Handle movement
-        if KeyPressHandler.up():
+        if KeyState.up():
             self.active = max(self.active-1, 0)
-        elif KeyPressHandler.down():
+        elif KeyState.down():
             self.active = min(self.active+1, len(self.options)-1)
-        elif KeyPressHandler.enter():
-            self.options[self.active]['click']()
+        elif KeyState.enter():
+            self.options[self.active]['action']()
 
     def draw(self):
         self.surface.fill(colors.CORNFLOWERBLUE) # Should this be placed in __init__ instead?

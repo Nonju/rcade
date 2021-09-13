@@ -1,73 +1,11 @@
 import pygame
-from pygame.locals import *
-
-# import sys
-
-# from constants import colors
-from .events import *
-from .states import ScreenState
-from .screens import menu, levelselect, game
-# from utils import KeyPressHandler, ControllerHandler
-
-# pygame.init()
-# if pygame.joystick.get_count():
-#     print('Found joystick - Initializing')
-#     ControllerHandler.init()
-
-# FPS = 30
-# FramePerSec = pygame.time.Clock()
-
-
-# Screen
-# screen_info = pygame.display.Info()
-# SCREEN_WIDTH = min(screen_info.current_w, 1024)
-# SCREEN_HEIGHT = min(screen_info.current_h, 800)
-# DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-# DISPLAYSURF.fill(colors.BROWN)
-pygame.display.set_caption('Sokoban')
-
-
-# def main():
-#     currentState = ScreenState.MENU
-#     Menu = menu.Menu(DISPLAYSURF)
-#     LevelSelect = None
-#     Game = None
-
-#     while True:
-#         events = pygame.event.get()
-#         for event in events:
-#             if event.type == QUIT:
-#                 pygame.quit()
-#                 sys.exit()
-#             elif event.type == GOTOLEVELSELECT:
-#                 LevelSelect = levelselect.LevelSelect(DISPLAYSURF)
-#                 currentState = ScreenState.LEVELSELECT
-#             elif event.type == GOTOGAME:
-#                 if bool(event.new):
-#                     Game = game.Game(DISPLAYSURF, level=event.level)
-#                 currentState = ScreenState.GAME
-
-#         if currentState == ScreenState.MENU:
-#             Menu.update(events)
-#             Menu.draw()
-#         elif currentState == ScreenState.LEVELSELECT:
-#             LevelSelect.update(events)
-#             LevelSelect.draw()
-#         elif currentState == ScreenState.GAME:
-#             Game.update(events)
-#             Game.draw()
-#         else: break
-
-#         KeyPressHandler.update(events)
-
-#         pygame.display.update()
-#         FramePerSec.tick(FPS)
-
-# if __name__ == '__main__':
-    # main()
-
 
 from ..gamebase import GameBase
+
+from .events import GOTOLEVELSELECT, GOTOGAME, GOTOMENU
+from .states import ScreenState
+from .screens import menu, levelselect, game
+
 
 class Sokoban(GameBase):
     def __init__(self, surface):
@@ -81,7 +19,9 @@ class Sokoban(GameBase):
         self.state = ScreenState.MENU
         self.loaded = False
 
+
     def load(self):
+        pygame.display.set_caption('Sokoban')
         self.menu = menu.Menu(self.surface)
         self.loaded = True
 
@@ -98,6 +38,9 @@ class Sokoban(GameBase):
                 if bool(event.new):
                     self.game = game.Game(self.surface, level=event.level)
                 self.state = ScreenState.GAME
+            elif event.type == GOTOMENU:
+                self.game = None
+                self.state = ScreenState.MENU
 
         if self.state == ScreenState.MENU:
             self.menu.update(events)

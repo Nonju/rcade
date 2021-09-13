@@ -53,7 +53,7 @@ class Game:
         self.wallImage = pygame.image.load(os.path.join(os.path.dirname(__file__), '../assets','wall.png')).convert_alpha()
         self.wallImage = pygame.transform.scale(self.wallImage, (self.tileWidth, self.tileWidth))
 
-        self.imageGroup = pygame.sprite.Group()
+        self.wallGroup = pygame.sprite.Group()
 
         # Victory screen
         self.menuEvent = pygame.event.Event(GOTOMENU)
@@ -211,24 +211,24 @@ class Game:
                 return self.getTile(pos) not in [Tile.WALL, Tile.SPACER, '']
 
             if notWall((x, y-1)):
-                self.imageGroup.add(MySprite(self.wallImage, (posX, posY), Direction.UP))
+                self.wallGroup.add(MySprite(self.wallImage, (posX, posY), Direction.UP))
             if notWall((x, y+1)):
-                self.imageGroup.add(MySprite(self.wallImage, (posX, posY), Direction.DOWN))
+                self.wallGroup.add(MySprite(self.wallImage, (posX, posY), Direction.DOWN))
             if notWall((x-1, y)):
-                self.imageGroup.add(MySprite(self.wallImage, (posX, posY), Direction.RIGHT))
+                self.wallGroup.add(MySprite(self.wallImage, (posX, posY), Direction.RIGHT))
             if notWall((x+1, y)):
-                self.imageGroup.add(MySprite(self.wallImage, (posX, posY), Direction.LEFT))
+                self.wallGroup.add(MySprite(self.wallImage, (posX, posY), Direction.LEFT))
 
 
     def draw(self):
         self.surface.fill(colors.DARKBROWN)
-        self.imageGroup.empty()
+        self.wallGroup.empty()
 
         if self.state in [GameState.PLAY, GameState.PAUSE]:
+            self.wallGroup.draw(self.surface)
             for y in range(len(self.level)):
                 for x in range(len(self.level[y])):
                     self.drawTile((x, y))
-                self.imageGroup.draw(self.surface)
         elif self.state == GameState.WIN:
             victoryRect = self.victorySurf.get_rect(center=(window.SCREEN_WIDTH / 2, window.SCREEN_HEIGHT * 0.3))
             self.surface.blit(self.victorySurf, victoryRect)

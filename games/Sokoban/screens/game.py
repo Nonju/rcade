@@ -150,12 +150,12 @@ class Game:
         self.playerPos = nextPos
 
     def checkWin(self):
+        def endVictoryCooldown():
+            self.victoryCooldown = False
+
         if all(bool(self.getTile(target) == Tile.BOX) for target in self.targetPos):
             self.state = GameState.WIN
-            Delay.call(f=self.endVictoryCooldown, ms=self.victoryKeyInputCooldown)
-
-    def endVictoryCooldown(self):
-        self.victoryCooldown = False
+            Delay.call(f=endVictoryCooldown, ms=self.victoryKeyInputCooldown)
 
     def gotoMenu(self):
         pygame.event.post(self.menuEvent)

@@ -3,7 +3,8 @@ import pygame
 
 from ..constants import colors
 from ..events import GOTOLEVELSELECT
-from utils import KeyState, ThrottledUpdate
+from utils import KeyState, ThrottledUpdate, MenuList
+from constants import window
 
 class Menu:
     def __init__(self, surface):
@@ -20,15 +21,13 @@ class Menu:
             dict(title=u'Avsluta', action=self.quit)
         ]
 
-        self.headerFont = pygame.font.SysFont(pygame.font.get_default_font(), self.getHeaderFontSize())
+        self.headerFont = pygame.font.Font('fonts/Roboto-Bold.ttf', self.getHeaderFontSize())
         self.headerSurf = self.headerFont.render('SOKOBAN!', False, colors.WHITE)
 
-        self.activeFont = pygame.font.SysFont(pygame.font.get_default_font(), 40)
-        self.inactiveFont = pygame.font.SysFont(pygame.font.get_default_font(), 30)
+        self.menuList = MenuList(surface, options=self.options)
 
     def getHeaderFontSize(self):
-        _, h = pygame.display.get_surface().get_size()
-        return int(h * 0.15)
+        return int(window.SCREEN_HEIGHT * 0.15)
 
     def newGame(self):
         pygame.event.post(self.newGameEvent)
@@ -41,47 +40,15 @@ class Menu:
         pygame.event.post(e)
 
     def update(self, events):
-        if not self.throttledUpdate.shouldUpdate(events):
-            return
-
-        # Handle movement
-        if KeyState.up():
-            self.active = max(self.active-1, 0)
-        elif KeyState.down():
-            self.active = min(self.active+1, len(self.options)-1)
-        elif KeyState.enter():
-            self.options[self.active]['action']()
+        self.menuList.update(events)
 
     def draw(self):
         self.surface.fill(colors.CORNFLOWERBLUE) # Should this be placed in __init__ instead?
 
-        y = 0
-
         # Draw header
-        self.surface.blit(self.headerSurf, (0, y))
-        y += self.getHeaderFontSize()
+        headerRect = self.headerSurf.get_rect(center=(window.SCREEN_WIDTH/2, self.getHeaderFontSize()))
+        self.surface.blit(self.headerSurf, headerRect)
 
         # Draw menu options
-        for index, option in enumerate(self.options):
-
-            # TODO: Use this to calculate center
-            #  w, h = pygame.display.get_surface().get_size()
-            '''
-                ## TODO:
-                # Center text using this method
-
-                # draw text
-                font = pygame.font.Font(None, 25)
-                text = font.render("You win!", True, BLACK)
-                text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-                screen.blit(text, text_rect)
-            '''
-
-            active = index == self.active
-            font = self.activeFont if active else self.inactiveFont
-            textSurface = font.render(option['title'], False, colors.ACTIVETEXT if active else colors.INACTIVETEXT)
-            self.surface.blit(textSurface, (0, y))
-            y += 40 if active else 30
-
-
+        self.menuList.draw()
 

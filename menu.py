@@ -3,8 +3,8 @@ import pygame
 from enum import Enum
 import os
 
-from constants import colors
-from utils import KeyState, ThrottledUpdate
+from constants import colors, window
+from utils import KeyState, ThrottledUpdate, MenuList
 from events import LOADGAME
 
 from games import gamesList
@@ -20,29 +20,20 @@ class Menu:
 		self.surface = surface
 		self.throttledUpdate = ThrottledUpdate()
 
-		# self.state = MenuState.START.value
 		self.gotoStart()
 
-		self.headerFont = pygame.font.SysFont(pygame.font.get_default_font(), self.getHeaderFontSize())
+		self.headerFont = pygame.font.Font('fonts/Roboto-Bold.ttf', self.getHeaderFontSize())
 		self.headerSurf = self.headerFont.render('< R-Cade >', False, colors.WHITE)
 
-		activeSize = self.getHeaderFontSize() * 0.3
-		self.activeFont = pygame.font.SysFont(pygame.font.get_default_font(), int(activeSize))
-		self.inactiveFont = pygame.font.SysFont(pygame.font.get_default_font(), int(activeSize * 0.9))
-
 		# Menu items
-		states = [state.value for state in MenuState]
-		self.active = {state: 0 for state in states}
-		self.items = {state: [] for state in states}
-		self.items[MenuState.START.value] = [
+		self.startMenuList = MenuList(surface, options=[
 			dict(title=u'Spela', action=self.gotoSelect),
 			dict(title=u'Avsluta', action=self.quit)
-		]
-		self.items[MenuState.GAMESELECT.value] = self.getGameItems()
+		])
+		self.gameSelectMenuList = MenuList(surface, options=self.getGameItems())
 
 	def getHeaderFontSize(self):
-		_, h = self.surface.get_size()
-		return int(h * 0.2)
+		return int(window.SCREEN_HEIGHT * 0.15)
 
 	def getGameItems(self):
 		items = []
@@ -52,15 +43,12 @@ class Menu:
 		return items
 
 	def gotoStart(self):
-		self.state = MenuState.START.value
+		self.state = MenuState.START
 
 	def gotoSelect(self):
-		self.state = MenuState.GAMESELECT.value
+		self.state = MenuState.GAMESELECT
 
-	def gotoGame(self):
-		state = MenuState.GAMESELECT.value
-		item = self.items[state][self.active[state]]
-
+	def gotoGame(self, item):
 		e = pygame.event.Event(LOADGAME, game=item.get('game'))
 		pygame.event.post(e)
 
@@ -69,35 +57,22 @@ class Menu:
 		pygame.event.post(e)
 
 	def update(self, events):
-		if not self.throttledUpdate.shouldUpdate(events):
-			return
-
-		if KeyState.up():
-			self.active[self.state] = max([0, self.active[self.state]-1])
-		elif KeyState.down():
-			self.active[self.state] = min([len(self.items[self.state])-1, self.active[self.state]+1])
-		elif KeyState.enter():
-			self.items[self.state][self.active[self.state]]['action']()
+		if self.state == MenuState.GAMESELECT:
+			self.gameSelectMenuList.update(events)
+		else:
+			self.startMenuList.update(events)
 
 
 	def draw(self):
 		self.surface.fill(colors.BLACK) # Should this be placed in __init__ instead?
 
-		width, height = self.surface.get_size()
-
 		# Draw header
-		headerRect = self.headerSurf.get_rect(center=((width // 2), self.getHeaderFontSize() / 2))
+		headerRect = self.headerSurf.get_rect(center=(window.SCREEN_WIDTH/2, self.getHeaderFontSize()))
 		self.surface.blit(self.headerSurf, headerRect)
 
-
 		# Draw items
-		y = height * 0.4
+		if self.state == MenuState.GAMESELECT:
+			self.gameSelectMenuList.draw()
+		else:
+			self.startMenuList.draw()
 
-		items = self.items[self.state]
-		for index, item in enumerate(items):
-				active = index == self.active[self.state]
-				font = self.activeFont if active else self.inactiveFont
-				textSurface = font.render(item['title'], False, colors.ACTIVETEXT if active else colors.INACTIVETEXT)
-				self.surface.blit(textSurface, (0, y))
-				_, h = font.size(item['title'])
-				y += h * 1.5

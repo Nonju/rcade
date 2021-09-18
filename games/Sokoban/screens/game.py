@@ -60,9 +60,10 @@ class Game:
         self.victoryKeyInputCooldown = 2000 # 2s
         self.victoryCooldown = True
 
-        self.victoryFont = pygame.font.SysFont(pygame.font.get_default_font(), int(window.SCREEN_HEIGHT * 0.25))
+        self.victoryFont = pygame.font.Font('fonts/Roboto-Bold.ttf', int(window.SCREEN_HEIGHT * 0.2))
         self.victorySurf = self.victoryFont.render('Du vann!!', False, colors.WHITE)
-        self.gotoMenuFont = pygame.font.SysFont(pygame.font.get_default_font(), int(window.SCREEN_HEIGHT * 0.05))
+
+        self.gotoMenuFont = pygame.font.Font('fonts/Roboto-MediumItalic.ttf', int(window.SCREEN_HEIGHT * 0.05))
         self.gotoMenuSurf = self.gotoMenuFont.render(u'Tryck på valfri tangent för att fortsätta', False, colors.WHITE)
 
     def loadLevel(self, level=''):

@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import K_RETURN, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_k, K_j, K_h, K_l
+from pygame.locals import K_RETURN, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_k, K_j, K_h, K_l
 
 from .controllerstate import ControllerState, J_UP, J_DOWN, J_RIGHT, J_LEFT, J_A, J_B, J_SELECT, J_START
 
@@ -46,6 +46,11 @@ class KeyState:
 	@classmethod
 	def enter(cls, single=True):
 		keys = [K_RETURN, J_A]
+		return cls.pressed(keys, single=single)
+
+	@classmethod
+	def escape(cls, single=True):
+		keys = [K_ESCAPE]
 		return cls.pressed(keys, single=single)
 
 	@classmethod

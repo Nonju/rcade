@@ -161,6 +161,14 @@ class Game:
     def gotoMenu(self):
         pygame.event.post(self.menuEvent)
 
+    def togglePause(self):
+        ## TODO
+        # Implement pause menu here
+        #  - "Continue" --> unpauses game
+        #  - "Exit" --> asks user if sure ('yes' --> calls gotoMenu, 'no' --> returns to pause menu)
+        # For now --> just go back to game main menu
+        self.gotoMenu()
+
     def update(self, events):
         if not self.throttledUpdate.shouldUpdate(events):
             return
@@ -174,6 +182,8 @@ class Game:
                 self.move(Direction.LEFT)
             elif KeyState.right():
                 self.move(Direction.RIGHT)
+            elif KeyState.escape():
+                self.togglePause()
 
             self.checkWin()
 

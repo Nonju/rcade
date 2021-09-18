@@ -3,7 +3,7 @@ import pygame
 import os
 
 from ..constants import colors
-from ..events import GOTOGAME
+from ..events import GOTOGAME, GOTOMENU
 from utils import KeyState, ThrottledUpdate, MenuList
 from constants import window
 
@@ -20,6 +20,7 @@ class LevelSelect:
         self.headerSurf = self.headerFont.render('Välj nivå!', False, colors.WHITE)
 
         options = [dict(title=level, action=self.startGame) for level in self.listLevels()]
+        options.append(dict(title=u'<< Meny', action=self.gotoStart))
         self.menuList = MenuList(surface, options=options)
 
     def getHeaderFontSize(self):
@@ -29,6 +30,10 @@ class LevelSelect:
         files = os.listdir(os.path.dirname(os.path.abspath(__file__)) + LEVEL_DIR)
         files = filter(lambda f: f.endswith('.sokoban'), files)
         return [f.split('.sokoban')[0] for f in files]
+
+    def gotoStart(self):
+        e = pygame.event.Event(GOTOMENU)
+        pygame.event.post(e)
 
     def startGame(self, item):
         level = item.get('title')

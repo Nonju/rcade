@@ -11,7 +11,7 @@ from constants import colors
 from constants.window import FPS, SCREEN_WIDTH, SCREEN_HEIGHT
 from menu import Menu
 from utils import KeyState, ControllerState, Delay
-from events import LOADGAME
+from events import LOADGAME, GOTOMAINMENU
 
 # Screen
 FramePerSec = pygame.time.Clock()
@@ -44,6 +44,9 @@ def main():
 				if event.game.get('cls'):
 					game = event.game['cls'](DISPLAYSURF)
 				state = MainState.GAME
+			elif event.type == GOTOMAINMENU:
+				game = None,
+				state = MainState.MENU
 
 		if state == MainState.GAME and game:
 			game.update(events)

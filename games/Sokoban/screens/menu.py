@@ -3,6 +3,7 @@ import pygame
 
 from ..constants import colors
 from ..events import GOTOLEVELSELECT
+from events import GOTOMAINMENU
 from utils import KeyState, ThrottledUpdate, MenuList
 from constants import window
 
@@ -36,7 +37,7 @@ class Menu:
         pass
 
     def quit(self):
-        e = pygame.event.Event(pygame.locals.QUIT)
+        e = pygame.event.Event(GOTOMAINMENU)
         pygame.event.post(e)
 
     def update(self, events):
